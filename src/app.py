@@ -209,12 +209,34 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Data Loading ---
-INPUT_DIR = "input_data"
+# Check for input_data in multiple locations
+if os.path.exists("input_data"):
+    INPUT_DIR = "input_data"
+elif os.path.exists("src/input_data"):
+    INPUT_DIR = "src/input_data"
+elif os.path.exists("../input_data"):
+    INPUT_DIR = "../input_data"
+else:
+    INPUT_DIR = None
+
 @st.cache_data
 def load_data():
-    return output_parser.load_all_data(INPUT_DIR)
+    if INPUT_DIR is None or not os.path.exists(INPUT_DIR):
+        return pd.DataFrame()
+    try:
+        return output_parser.load_all_data(INPUT_DIR)
+    except Exception as e:
+        st.error(f"データ読み込みエラー: {e}")
+        return pd.DataFrame()
 
 df = load_data()
+
+# Show message if no data
+if df.empty:
+    st.warning("⚠️ データファイルが見つかりません。`input_data/` フォルダにPDFファイルを配置してください。")
+    st.info("このダッシュボードを使用するには、試算表PDFデータが必要です。")
+    st.stop()
+
 
 # --- Data Cleaning (Aggressive) ---
 if not df.empty:
