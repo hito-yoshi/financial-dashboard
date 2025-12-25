@@ -1,12 +1,17 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import src.pdf_parser as output_parser
 import os
-import importlib
+import sys
 import re
 import time
+
+# Fix import path for Streamlit Cloud
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import pdf_parser as output_parser
+
 import google.generativeai as genai
+
 
 # --- Gemini API Setup ---
 # You can set your API key here or via environment variable GOOGLE_API_KEY
@@ -99,9 +104,9 @@ def generate_contextual_response(prompt, monthly_ctx, annual_ctx, sales, gp, op,
 - 「資金繰りの改善策は？」"""
 
 
-# Ensure fresh logic
-importlib.reload(output_parser)
-output_parser.PARSING_TRACE = [] # Reset trace
+# Reset parsing trace
+output_parser.PARSING_TRACE = []
+
 
 # --- Page Config ---
 st.set_page_config(page_title="経営分析ダッシュボード", layout="wide", page_icon="📈", initial_sidebar_state="expanded")
